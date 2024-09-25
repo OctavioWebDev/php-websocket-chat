@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+    <!-- Main container -->
+    <div class="container mx-auto mt-10 max-w-lg p-4 bg-white shadow-md rounded-lg">
+        <h1 class="text-xl font-bold mb-4 text-center">WebSocket Chat</h1>
+        <!-- Chat box container -->
+        <div id="chat" class="border border-gray-300 h-64 p-4 overflow-y-scroll bg-gray-50 rounded-lg mb-4">
+            <!-- Chat messages will appear here -->
+        </div>
+        <!-- Message input and send button container -->
+        <div class="flex">
+            <input type="text" id="message" placeholder="Enter your message"
+                class="flex-1 p-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="Enter your message">
+            <button id="send"
+                class="bg-blue-500 text-white px-4 py-2 rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                Send
+            </button>
+        </div>
+    </div>
+    <!-- WebSocket Chat Script -->
+    <script>
+        // Create a new WebSocket connection
+        let socket = new WebSocket("ws://localhost:8080");
+        // Reference to the chat div where messages will be displayed
+        let chat = document.getElementById('chat');
+        // When the connection is opened
+        socket.onopen = function (event) {
+            // Log connection status
+            console.log('Connected to WebSocket server');
+        };
+        // When a message is received from the WebSocket server
+        socket.onmessage = function (event) {
+            // Display the received message in the chat div
+            let message = document.createElement('p');
+            message.textContent = event.data;
+            message.className = "bg-gray-200 p-2 rounded-md my-1"; // Add simple styling to messages
+            chat.appendChild(message);
+        };
+        // When the connection is closed
+        socket.onclose = function (event) {
+            // Log connection close status
+            console.log('Disconnected from WebSocket server');
+        };
+        // When an error occurs
+        socket.onerror = function (error) {
+            // Log error
+            console.log('WebSocket Error: ' + error);
+        };
+        // Function to send message to the WebSocket server
+        document.getElementById('send').onclick = function () {
+            let message = document.getElementById('message').value;
+            // Send the message to the WebSocket server
+            if (message.trim() !== "") {
+                socket.send(message);
+                document.getElementById('message').value = ''; // Clear the message input field
+            }
+        };
+    </script>
+</body>
+</html>
